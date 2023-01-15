@@ -22,11 +22,11 @@ import { auth, db, twitterProvider } from '../utils/firebase';
 
 const List = () => {
   const [row, setRow] = useState<Array<any>>([]);
-  const [stats, setStats] = useState({
-    tweetCount: 1000,
-    verifiedCount: 100,
-    donatedCount: 0,
-  });
+  // const [stats, setStats] = useState({
+  //   tweetCount: 1000,
+  //   verifiedCount: 100,
+  //   donatedCount: 0,
+  // });
   // const [searchText, setSearchText] = useState('');
   const [fetching, setFetching] = useState(false);
   const [inputText, setInputText] = useState('');
@@ -221,18 +221,18 @@ const List = () => {
     fetchInitialData();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      db.collection('stats')
-        .doc('data')
-        .onSnapshot((doc: any) => {
-          const statsData: any = doc.data();
-          // console.log('got statsData ', statsData);
-          setStats(statsData);
-        });
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     db.collection('stats')
+  //       .doc('data')
+  //       .onSnapshot((doc: any) => {
+  //         // const statsData: any = doc.data();
+  //         // console.log('got statsData ', statsData);
+  //         // setStats(statsData);
+  //       });
+  //   };
+  //   fetchData();
+  // }, []);
 
   const popupSignIn = async () => {
     auth
@@ -308,7 +308,7 @@ const List = () => {
               color="text.secondary"
               className="!text-center !m-2 !text-nostr-light"
             >
-              {stats.tweetCount}
+              {/* {stats.tweetCount} */}
             </Typography>
           </Paper>
           <Paper className="!p-2 !text-center">
@@ -324,7 +324,7 @@ const List = () => {
               color="text.secondary"
               className="!text-center !m-2 !text-nostr-light"
             >
-              {stats.verifiedCount}
+              {/* {stats.verifiedCount} */}
             </Typography>
           </Paper>
           <Paper className="!p-2 !text-center">
@@ -340,7 +340,7 @@ const List = () => {
               color="text.secondary"
               className="!text-center !m-2 !text-nostr-light"
             >
-              {stats.donatedCount}
+              {/* {stats.donatedCount} */}
             </Typography>
           </Paper>
         </Stack>
