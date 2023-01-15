@@ -58,6 +58,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Background } from '../background/Background';
 import { OutlinedButton } from '../button/OutlinedButton';
 import { Section } from '../layout/Section';
+import { AppConfig } from '../utils/AppConfig';
 import { db } from '../utils/firebase';
 import { defaultRelays, hexToNpub, npubToHex } from '../utils/helpers';
 
@@ -84,6 +85,7 @@ const Profile = () => {
     telegram: '',
     telegramUserName: '',
     telegramMsgId: '',
+    telegramEvent: '',
   });
   const [wotScore, setWotScore] = useState(0);
   const [fetching, setFetching] = useState(false);
@@ -274,15 +276,6 @@ const Profile = () => {
       duplicates.find((x: any) => x.verified === true) || duplicates[0];
 
     console.log('got data ', tweetObj, fetching);
-
-    // calculate wotScore
-    let tmpWot = wotScore;
-    if (tweetObj.verified) tmpWot += 10;
-    if (tweetObj.mastodon) tmpWot += 10;
-    if (tweetObj.donated) tmpWot += 10;
-    if (tweetObj.telegram) tmpWot += 10;
-    setWotScore(tmpWot);
-
     setTweet(tweetObj);
     // console.log(`setTweet to `, tweetObj);
 
@@ -451,10 +444,19 @@ const Profile = () => {
   }, [userRelays]);
 
   useEffect(() => {
-    if (nip05 === '')
+    if (nip05 === '') {
       // increment wotscore
       setWotScore((ws) => ws + 10);
+    }
   }, [nip05]);
+
+  useEffect(() => {
+    // calculate wotScore
+    if (tweet.verified) setWotScore((ws) => ws + 10);
+    if (tweet.mastodon) setWotScore((ws) => ws + 10);
+    if (tweet.donated) setWotScore((ws) => ws + 10);
+    if (tweet.telegram) setWotScore((ws) => ws + 10);
+  }, [tweet]);
 
   useEffect(() => {
     if (validPFP || !tweet.profileImageUrl) return;
@@ -557,7 +559,22 @@ const Profile = () => {
                 </Avatar>
               </Tooltip>
             }
-            title={tweet.screenName}
+            title={
+              <>
+                {tweet.screenName}{' '}
+                <IconButton
+                  aria-label="copy profile link"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${AppConfig.domain}/p/${tweet.screenName || ''}`
+                    );
+                  }}
+                  size="small"
+                >
+                  <ContentCopy />
+                </IconButton>
+              </>
+            }
             titleTypographyProps={{ fontSize: 'x-large' }}
             subheader={`${tweet.nPubKey.slice(0, 8)}...${tweet.nPubKey.slice(
               -8
@@ -569,7 +586,7 @@ const Profile = () => {
               Badges
             </Typography>
             <div className="mt-2 mb-4 flex-col items-center">
-              <div className="my-2">
+              <div className="my-2 flex items-center">
                 {tweet.verified === true ? (
                   <>
                     <a
@@ -577,16 +594,28 @@ const Profile = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <VerifiedUserIcon color="success" className="mr-2" />
+                      <VerifiedUserIcon
+                        color="success"
+                        className="mr-2"
+                        fontSize="large"
+                      />
+                    </a>
+                    <span>
                       User has signed their <b>twitter</b> handle with their
                       nostr private key.
-                    </a>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <VerifiedUserIcon color="error" className="mr-2" />
-                    User has <b>NOT</b> signed their <b>twitter</b> handle with
-                    their nostr private key.
+                    <VerifiedUserIcon
+                      color="error"
+                      className="mr-2"
+                      fontSize="large"
+                    />
+                    <span>
+                      User has <b>NOT</b> signed their <b>twitter</b> handle
+                      with their nostr private key.
+                    </span>
                   </>
                 )}
                 <HelpOutline
@@ -611,7 +640,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="my-2">
+              <div className="my-2 flex items-center">
                 {tweet.telegram ? (
                   <>
                     <a
@@ -619,16 +648,28 @@ const Profile = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <VerifiedUserIcon color="success" className="mr-2" />
+                      <VerifiedUserIcon
+                        color="success"
+                        className="mr-2"
+                        fontSize="large"
+                      />
+                    </a>
+                    <span>
                       User has signed their <b>telegram</b> profile with their
                       nostr private key.
-                    </a>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <VerifiedUserIcon color="error" className="mr-2" />
-                    User has <b>NOT</b> signed their <b>telegram</b> profile
-                    with their nostr private key.
+                    <VerifiedUserIcon
+                      color="error"
+                      className="mr-2"
+                      fontSize="large"
+                    />
+                    <span>
+                      User has <b>NOT</b> signed their <b>telegram</b> profile
+                      with their nostr private key.
+                    </span>
                   </>
                 )}
                 <HelpOutline
@@ -691,7 +732,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="my-2">
+              <div className="my-2 flex items-center">
                 {tweet.mastodon ? (
                   <>
                     <a
@@ -699,16 +740,28 @@ const Profile = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <VerifiedUserIcon color="success" className="mr-2" />
+                      <VerifiedUserIcon
+                        color="success"
+                        className="mr-2"
+                        fontSize="large"
+                      />
+                    </a>
+                    <span>
                       User has signed their <b>mastodon</b> profile with their
                       nostr private key.
-                    </a>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <VerifiedUserIcon color="error" className="mr-2" />
-                    User has <b>NOT</b> signed their <b>mastodon</b> profile
-                    with their nostr private key.
+                    <VerifiedUserIcon
+                      color="error"
+                      className="mr-2"
+                      fontSize="large"
+                    />
+                    <span>
+                      User has <b>NOT</b> signed their <b>mastodon</b> profile
+                      with their nostr private key.
+                    </span>
                   </>
                 )}
                 <HelpOutline
@@ -755,7 +808,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="my-2">
+              <div className="my-2 flex items-center">
                 {nip05 ? (
                   <>
                     <a
@@ -765,14 +818,27 @@ const Profile = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <AlternateEmail color="success" className="mr-2" />
-                      User has a valid NIP-05 identifier: <b>{nip05}</b>
+                      <AlternateEmail
+                        color="success"
+                        className="mr-2"
+                        fontSize="large"
+                      />
                     </a>
+                    <span>
+                      User has a valid NIP-05 identifier: <b>{nip05}</b>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <AlternateEmail color="error" className="mr-2" />
-                    User has <b>NOT</b> set a NIP-05 identifier for themselves.
+                    <AlternateEmail
+                      color="error"
+                      className="mr-2"
+                      fontSize="large"
+                    />
+                    <span>
+                      User has <b>NOT</b> set a NIP-05 identifier for
+                      themselves.
+                    </span>
                   </>
                 )}
                 <HelpOutline
@@ -802,28 +868,31 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="my-2 flex">
+              <div className="my-2 flex items-center">
                 {tweet.donated ? (
                   <>
                     <Avatar
-                      sx={{ width: 24, height: 24, bgcolor: 'orange' }}
+                      sx={{ width: 35, height: 35, bgcolor: 'orange' }}
                       className="mr-2 inline-flex"
                     >
-                      <CurrencyBitcoinIcon htmlColor="white" />
+                      <CurrencyBitcoinIcon htmlColor="white" fontSize="large" />
                     </Avatar>
-                    User has sent a 1000+ sats donation to nostr.directory with
-                    their nostr pubkey.
+                    <span>
+                      User has sent a 1000+ sats donation to nostr.directory.
+                    </span>
                   </>
                 ) : (
                   <>
                     <Avatar
-                      sx={{ width: 24, height: 24, bgcolor: '#d32f2f' }}
+                      sx={{ width: 35, height: 35, bgcolor: '#d32f2f' }}
                       className="mr-2 inline-flex"
                     >
-                      <CurrencyBitcoinIcon htmlColor="white" />
+                      <CurrencyBitcoinIcon htmlColor="white" fontSize="large" />
                     </Avatar>
-                    User has <b className="mx-1"> NOT</b> sent a 1000+ sats
-                    donation to nostr.directory with their nostr pubkey.
+                    <span>
+                      User has <b>NOT</b> sent a 1000+ sats donation to
+                      nostr.directory.
+                    </span>
                   </>
                 )}
                 <HelpOutline
@@ -853,7 +922,7 @@ const Profile = () => {
                             className="font-bold underline"
                           >
                             {' '}
-                            message
+                            message/comment/payer.
                           </a>
                           .
                         </>
